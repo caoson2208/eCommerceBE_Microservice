@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  product-service:
+    build: ./product-service
+    ports:
+      - '4001:4001'
+    depends_on:
+      - category-service
+    networks:
+      - mynetwork
+
+  category-service:
+    build: ./category-service
+    ports:
+      - '4002:4002'
+    networks:
+      - mynetwork
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - '4003:4003'
+    networks:
+      - mynetwork
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - '4000:4000'
+    depends_on:
+      - product-service
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
