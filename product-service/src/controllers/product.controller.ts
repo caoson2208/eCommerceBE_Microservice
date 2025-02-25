@@ -124,48 +124,33 @@ const getProducts = async (req: Request, res: Response) => {
       $options: 'i',
     }
   }
-
-  try {
-    const categoryResponse = await axios.get(process.env.CATEGORY_SERVICE_URL)
-    const categories = categoryResponse.data?.data || []
-
-    let [products, totalProducts] = await Promise.all([
+  let [products, totalProducts]: [products: any, totalProducts: any] =
+    await Promise.all([
       ProductModel.find(condition)
+        .populate({
+          path: 'category',
+        })
         .sort({ [sort_by as string]: order === 'desc' ? -1 : 1 })
         .skip(page * limit - limit)
         .limit(limit)
         .select({ __v: 0, description: 0 })
         .lean(),
-      ProductModel.countDocuments(condition).lean(),
+      ProductModel.find(condition).countDocuments().lean(),
     ])
-
-    products = products.map((product) => {
-      const categoryInfo = categories.find(
-        (cat: any) => cat._id.toString() === product.category?.toString()
-      )
-      return {
-        ...handleImageProduct(product),
-        category_name: categoryInfo ? categoryInfo.name : 'Không xác định',
-      }
-    })
-
-    const page_size = Math.ceil(totalProducts / limit) || 1
-    const response = {
-      message: 'Lấy các sản phẩm thành công',
-      data: {
-        products,
-        pagination: {
-          page,
-          limit,
-          page_size,
-        },
+  products = products.map((product) => handleImageProduct(product))
+  const page_size = Math.ceil(totalProducts / limit) || 1
+  const response = {
+    message: 'Lấy các sản phẩm thành công',
+    data: {
+      products,
+      pagination: {
+        page,
+        limit,
+        page_size,
       },
-    }
-    return responseSuccess(res as any, response)
-  } catch (error) {
-    console.error('Lỗi khi gọi Category Service:', error)
-    return res.status(500).json({ message: 'Lỗi khi lấy danh mục sản phẩm' })
+    },
   }
+  return responseSuccess(res, response)
 }
 
 const getAllProducts = async (req: Request, res: Response) => {

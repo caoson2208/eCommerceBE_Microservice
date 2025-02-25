@@ -23,15 +23,6 @@ app.use(
 )
 
 app.use(
-  '/api/categories',
-  createProxyMiddleware({
-    target: CATEGORY_SERVICE_URL,
-    changeOrigin: true,
-    pathRewrite: { '^/': '/api/categories' },
-  })
-)
-
-app.use(
   '/',
   createProxyMiddleware({
     target: AUTH_SERVICE_URL,

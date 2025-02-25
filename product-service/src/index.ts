@@ -9,6 +9,7 @@ import cors from 'cors'
 import chalk from 'chalk'
 import helmet from 'helmet'
 import productRoutes from './routes/product.route'
+import categoryRoutes from './routes/category.route'
 
 require('dotenv').config()
 
@@ -38,6 +39,7 @@ const handlerImage: any = Object.values(FOLDERS).reduce(
 app.use(`/${ROUTE_IMAGE}`, ...handlerImage)
 
 app.use('/api/products', productRoutes)
+app.use('/api/categories', categoryRoutes)
 
 // Để xử lý các lỗi nếu có
 app.use(function (err: any, req: any, res: any, next: any) {
